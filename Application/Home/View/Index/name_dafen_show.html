@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>姓名测试--打分结果</title>
+    <style type="text/css">
+    #nav{
+        margin-left:5%;
+        border:2px solid #05a1ea;
+        width:90%;
+        margin-top:10px;
+        border-top-left-radius:15px;
+        border-top-right-radius:15px;
+        border-bottom-left-radius:15px;
+        border-bottom-right-radius:15px
+     }
+     .dd{
+        margin: 0 auto;
+        font-size: 40px;
+        width:90%;
+        /*height: 80px;*/
+        line-height: 50px;
+        padding-left: 15px;
+        border-bottom: 2px solid #05a1ea;
+        padding-top: 20px;
+     }
+     p{font-size: 35px;}
+    #nav .hs{font-size: 25px; color: #999; margin: 0px;}
+    .red{color: red;}
+    .red1{color: red; font-size: 35px;}
+    #nav .s_nav{
+        padding-left: 1%;
+        width: 96%;
+        margin-left:1%; 
+    }
+    h1{
+        font-size:45px;
+    }
+    td{
+        font-size: 30px;
+    }
+    .font_trdzw{
+        font-size: 30px;
+    }
+    .font_white{
+        color:white;
+    }
+    .hs{
+        padding-bottom: 10px;
+    }
+    .dd{
+        width:90%;
+        height:100px;
+    }
+    .c_dafen{
+        width:100%;
+    }
+    .c_dafen .dafen_left li {
+        float: left;
+        width: 55px;
+        font-size: 12px;
+        margin: 0 5px;
+        line-height: 16px;
+        text-align: center;
+        color: #666666;
+    }
+    .c_dafen .dafen_left li div {
+        float: left;
+        width: 55px;
+        width: 55px;
+        text-align: center;
+        background: url("__PUBLIC__/Home/images/tian_zi_ge_bg.gif") no-repeat center 0px;
+        font-size: 34px;
+        font-weight: bold;
+        line-height: 56px; 
+        color: #000000;
+    }
+    .c_dafen .dafen_right {
+        float: right;
+/*        position: fixed;
+        top:10px;
+        right:10px;*/
+        width: 168px;
+    }
+        .c_dafen .dafen_right .dr_ass {
+        float: left;
+        width: 168px;
+        height: 69px;
+        background: url("__PUBLIC__/Home/images/xingming_pingfen_bg.gif");
+    }
+    .c_dafen .dafen_right .dr_desc {
+        float: left;
+        width: 168px;
+        line-height: 25px;
+        font-size: 12px;
+        color: #666666;
+        text-align: center;
+    }
+    .c_dafen .dafen_right .dr_ass span {
+        float: right;
+        font-size: 35px;
+        padding-right: 25px;
+        color: #EF1C23;
+        font-weight: bold;
+        line-height: 73px; /* 55px */ 
+    }
+    .pad{
+        width:100%;
+        height:20px;
+    }
+    </style>
+</head>
+<body>
+  <!--   <nav>
+        <img src="logo.png" alt="" width="820px">
+    </nav> -->
+    <section>
+       
+         <div class="dd">
+             <!-- <span>{$data.xm}的姓名测试结果如下：</span> -->
+              {$data.score}
+         </div>
+         <br>
+         <div id="nav">
+            <div class="s_nav">
+                {$data.three}
+            </div>
+         </div>
+         <div id="nav">
+            <div class="s_nav">
+                <div class="pad"></div>
+                {$data.five}
+            </div>
+         </div>
+         <div id="nav">
+            <div class="s_nav">
+                {$data.hint}
+                <div class="pad"></div>
+            </div>
+         </div>
+         <div id="nav">
+            <div class="s_nav">
+                <p>{$data.tghead}（<span class="hs">天格数是先祖留传下来的，其数理对人影响不大。</span>）</p>
+                <hr/>
+                
+                {$data.tgbody}
+                <span class="red1">什么是天格？</span>
+                <p class="hs">天格：又称先格，是祖先留下来的，对人生影响不大。代表双亲、长上、事业、名誉；单独化表其本人之气质，女性依附丈夫生活，又有代表丈夫吉凶之暗灵作用，代表童少年运。（按：包含职业之意义。）</p>
+            </div>
+         </div>
+         <div id="nav">
+            <div class="s_nav">
+                <p>{$data.rghead}（<span class="hs">格数又称主运，是姓名的中心点，影响人一生的命运。</span>）</p>
+                <hr/>
+                <!-- <p>突破万难的刚柔兼备数。【<span class="red">大吉</span>】</p> -->
+                {$data.rgbody}
+                <span class="red1">什么是人格？</span>
+                <p class="hs">人格：又称主格，是姓名的中心点，主管人一生命运。代表其人形性、自我意识、人生观念；如命理之命主，为姓名吉凶之主动力，单独代表其人之性格，代表主运。</p>
+            </div>
+         </div>
+         <div id="nav">
+            <div class="s_nav">
+                <p>{$data.dghead}（<span class="hs">地格数又称前运，影响人中年（36岁）以前的活动力。</span>）</p>
+                <hr/>
+                <!-- <p>突破万难的刚柔兼备数。【<span class="red">大吉</span>】</p> -->
+                {$data.dgbody}
+                <span class="red1">什么是地格？</span>
+                <p class="hs">地格：又称前运，是前半生的命运，会影响中年以前。代表其人下辈、子女、妻妾、根基；单独代表其人之根基，代表前运。（按：包含居住田宅之意义。）
+                </p>
+            </div>
+         </div>
+         <div id="nav">
+            <div class="s_nav">
+                <p>{$data.wghead}（<span class="hs">外格又称变格，影响人的社交能力、智慧等。</span>）</p>
+                <hr/>
+                <!-- <p>突破万难的刚柔兼备数。【<span class="red">大吉</span>】</p> -->
+                {$data.wgbody}
+                <span class="red1">什么是外格？</span>
+                <p class="hs">外格：又称灵运，主管命运之灵力、社交能力和智慧。代表外界、平辈、朋友、兄弟、姊妹之人际关系，代表副运。（按：包含疾厄、奴仆、夫妻之意义。）
+                </p>
+            </div>
+        </div>    
+            <div id="nav">
+            <div class="s_nav">
+                <p>{$data.zghead}（<span class="hs">总格又称后运，影响人中年（36岁）以后的命运。</span>）</p>
+                <hr/>
+                <!-- <p>突破万难的刚柔兼备数。【<span class="red">大吉</span>】</p> -->
+                {$data.zgbody}
+                <span class="red1">什么是总格？</span>
+                <p class="hs">总格：又称后运，是后半生的命运，影响中年到老年。代表其人之一生，总纳天地人三格之意义，但对于其人性格、职业、运命富于变化之中早年运缺乏明显的暗灵作用，但于其人成为一定之性向类型之后，即发生灵导吉凶作用，代表其人后运。（按：包含福德之意义。）
+                </p>
+            </div>
+         </div>
+    </section>
+</body>
+</html>

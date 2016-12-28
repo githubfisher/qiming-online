@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title>在线起名后台管理系统</title>
+<meta name="author" content="DeathGhost" />
+<link rel="stylesheet" type="text/css" href="__PUBLIC__/Admin/css/style.css" />
+<link rel="stylesheet" type="text/css" href="__PUBLIC__/Admin/css/page.css" />
+<!--[if lt IE 9]>
+<script src="__PUBLIC__/Admin/js/html5.js"></script>
+<![endif]-->
+<script src="__PUBLIC__/Admin/js/jquery.js"></script>
+<script src="__PUBLIC__/Admin/js/jquery.mCustomScrollbar.concat.min.js"></script>
+<script>
+
+  function addshow(){
+    $(".back").slideDown(200);
+    $(".addform").slideDown(200);
+  }
+
+  $(document).ready(function(){
+       $("#closed").click(function(){
+        //alert('xxxx');
+         $(".delbg").fadeOut();
+         });
+        $(".falseBtn").click(function(){
+        //alert('xxxx');
+         $(".delbg").fadeOut();
+         });
+        $("#formbutton").click(function(){
+            var storename = $("#store_name").val();
+            var user = $("#user").val();
+            var power_id = $("#power_id").val();
+            var deadline = $("#deadline").val();
+            $.post("/index.php/Admin/Manage/add_user",{user:user,storename:storename,power_id:power_id,deadline:deadline},function(add){
+                if(add.status == 1){
+                    document.getElementById("megmeg").innerHTML="添加成功！";
+                    $(".meg").fadeIn();
+                    setTimeout(function(){
+                       $(".meg").fadeOut();
+                       window.location.reload();
+                    },800);
+                    return true;
+                }else{
+                    document.getElementById("megimg").innerHTML="X";
+                    document.getElementById("megmeg").innerHTML="添加失败！";
+                    $(".meg").fadeIn();
+                    setTimeout(function(){
+                       $(".meg").fadeOut();
+                       $(".back").fadeOut();
+                    },1000);
+                    return false;
+                }
+            });
+        });
+        $(".shutdown").click(function(){
+          $(".back").fadeOut();
+          $(".addform").fadeOut();
+        });
+      });
+     function updateshow(id){
+        //alert(id);
+        var showtrid = id + "a";
+        var showtr = document.getElementById(showtrid);
+        showtr.style.display="none";
+        var updatetr = document.getElementById(id);
+        updatetr.style.display = "table-row";
+        var updatetd = document.getElementById(id+"b");
+        updatetd.focus();
+        //序号从大到小的排列时，这时遇到不知道最大的行是哪一个的问题
+        for(var i=1;i<15;i++){
+          var toptrid = id+i;
+          if(document.getElementById(toptrid)){
+            var toptr = "#"+toptrid+"a";
+            $(toptr).addClass("alltd");
+            break;
+          }else{
+            var indexrowid = document.getElementById(id).rowIndex; 
+            if(indexrowid === 2){
+              //alert(indexrowid);
+              var toptr = "#o0";
+              //alert(toptrid);
+              $(toptr).addClass("alltd");
+              break;
+            }
+          }
+        }
+
+        //序号从小到大排列时，有个缺陷，第一行不是总是1，会又失灵的时候
+        // for(var i=1;i<15;i++){
+        //   var toptrid = id-i;
+        //   if(document.getElementById(toptrid)){
+        //     var toptr = "#"+toptrid+"a";
+        //     $(toptr).addClass("alltd");
+        //     break;
+        //   }else{
+        //     var indexrowid = document.getElementById(id).rowIndex; 
+        //     //alert(indexrowid);
+        //     if(indexrowid === 2){
+        //       var toptr = "#o0";
+        //       $(toptr).addClass("alltd");
+        //       break;
+        //     }
+        //   }
+        // }
+
+        //最简单的处理，忽略了被删除，id不全时的情况
+        // var toptrid = id-1;
+        // if(toptrid === 0){
+        //   var toptr = "#o"+toptrid;
+        // }else{
+        //   var toptr = "#"+toptrid+"a";
+        // }
+        // $(toptr).addClass("alltd");
+       // toptr.addClass("alltd");
+
+       //错误的尝试，最后决定用addClass的方式
+        //toptr.style.borderBottom="1px solid #67c1a5";
+        //var toptrclass = document.getElementByClassName("o"+toptrid);
+        //$("th").style.borderBottom="1px solid #67c1a5";
+        //toptrclass.style.borderBottom="1px solid #67c1a5";
+        //toptr.css=("border-bottom","1px solid #67c1a5");
+        //var toptr = "tr#"+toptrid+" ."+toptrid;
+       // $("#o0").style.display="none";
+        //alert(toptr);
+        //$(toptr).style.display="none";
+        // var toptr = document.getElementById(toptrid);
+        // toptr.style.border="1px solid #67c1a5";
+        // toptr.css = ("border-bottom","1px solid #67c1a5");
+        //alert(toptr); 
+     }
+     function updateclose(id){
+        var showtrid = id + "a";
+        var showtr = document.getElementById(showtrid);
+        showtr.style.display="table-row";
+        var updatetr = document.getElementById(id);
+        updatetr.style.display = "none";
+        for(var i=1;i<15;i++){
+          var toptrid = id+i;
+          if(document.getElementById(toptrid)){
+            var toptr = "#"+toptrid+"a";
+            $(toptr).removeClass("alltd");
+            break;
+          }else{
+            var indexrowid = document.getElementById(id).rowIndex; 
+            if(indexrowid === 2){
+              //alert(indexrowid);
+              var toptr = "#o0";
+              //alert(toptrid);
+              $(toptr).removeClass("alltd");
+              break;
+            }
+          }
+        }
+        // var toptrid = id-1;
+        // if(toptrid === 0){
+        //   var toptr = "#o"+toptrid;
+        // }else{
+        //   var toptr = "#"+toptrid+"a";
+        // }
+        // $(toptr).removeClass("alltd");
+     }
+     function updatesubmit(id){
+        //$("#"+id+"z").submit();
+        var store_name = $("#"+id+"b");
+        var user = $("#"+id+"c");
+        var secretcode = $("#"+id+"d");
+        var register_time = $("#"+id+"e");
+        var deadline_time = $("#"+id+"f");
+        var power_id = $("#"+id+"g");  
+        $.post("/index.php/Admin/Manage/update_user",{id:id,store_name:store_name.val(),user:user.val(),secretcode:secretcode.val(),register_time:register_time.val(),deadline_time:deadline_time.val(),power_id:power_id.val()},function(data){
+                if(data.status == 1){
+                    updateclose(id);
+                    window.location.reload();
+                    return true;
+                }else{
+                  document.getElementById("megimg").innerHTML="X";
+                  document.getElementById("megmeg").innerHTML="更新失败！";
+                  $(".meg").fadeIn();
+                  setTimeout(function(){
+                     $(".meg").fadeOut();
+                     updateclose(id);
+                  },800);
+                  return false;
+                    // alert(data.info);
+                    // window.location.reload();
+                }
+        });
+     }
+     function delshow(id){
+      document.getElementById("storename").innerHTML=id;
+      $(".delbg").fadeIn();
+     }
+     function deldo(){
+      var id = document.getElementById("storename").innerHTML;
+      // alert(id);
+      $.post("/index.php/Admin/Manage/del_user",{id:id},function(del){
+                if(del.status == 1){
+                    $(".meg").fadeIn();
+                    setTimeout(function(){
+                       $(".meg").fadeOut();
+                       window.location.reload();
+                    },1000);
+                     //
+                    return true;
+                }else{
+                    document.getElementById("megimg").innerHTML="X";
+                    document.getElementById("megmeg").innerHTML="删除失败！";
+                    $(".meg").fadeIn();
+                    setTimeout(function(){
+                       $(".meg").fadeOut();
+                       $(".delbg").fadeOut();
+                    },1000);
+                    return false;
+                    // alert(data.info);
+                    // window.location.reload();
+                }
+        });
+     }
+     function check_phone(phone){
+      if(phone != '' && phone != null){
+        $.post("/index.php/Admin/Manage/check_phone",{phone:phone},function(data){
+          if(data.status == 1){
+            document.getElementById("errorinfo").innerHTML=data.info;
+            document.getElementById("errorinfo").style.color="green";
+          }else{
+            document.getElementById("errorinfo").innerHTML=data.info;
+            document.getElementById("errorinfo").style.color="red";
+          }
+        });
+      }else{
+        document.getElementById("errorinfo").innerHTML='';
+      }
+     }
+</script>
+<style>
+  td {
+    text-align: center;
+  }
+   a {
+    color:#333;
+  }
+  .actived{
+    color:#67c1a5;
+  }
+  .righta{
+    position:fixed;
+    right:1%;
+  }
+  .fx{
+    float:left;
+  }
+  .rightb{
+    margin-right:6%;
+  }
+  .back{
+    position: fixed;
+    top:0px;
+    left:0px;
+    width:100%;
+    height:100%;
+    display:none;
+    z-index:99;
+    background-color: #666;
+    opacity: 0.95;
+  }
+  .addform{
+    background-color: #FCFCFC;
+    width:30%;
+    height:40%;
+    margin:0 auto;
+    margin-top:10%;
+    display:none;
+    z-index:100;
+    opacity: 1;
+    border-radius: 5px;
+  }
+  .formbody{
+    margin:0 auto;
+    width:90%;
+    padding:30px;
+
+  }
+  .shutdown{
+    float: right;
+    position: relative;
+    right: -15px;
+    top: -15px;
+  }
+  .shutdown p{
+    border: 1px solid rgb(51, 51, 51);
+    width: 20px;
+    height: 20px;
+    border-radius: 100%;
+/*    transition: 0.5s;*/
+  }
+  .shutdown span{
+    margin-left: 0.3em;
+  }
+  .formtitle{
+    text-align: center;
+    padding-bottom: 20px;
+  }
+  .formtitle h1{
+    font-size: 2.2em;
+  }
+  .formin{
+    text-align: center;
+  }
+  .formin label{
+    padding-right: 10px;
+  }
+  .formin input{
+    width:70%;
+    height:20px;
+    margin:5px 5px;
+  }
+  .formin select{
+    width:72%;
+    height:35px;
+    margin:5px 5px;
+  }
+  #formbutton{
+    width: 86.4%;
+    height: 30px;
+    border-radius: 5px;
+    line-height: 30px;
+    border: 0;
+    background-color: #67c1a5;
+    color:white;
+  }
+  #formbutton:hover{
+    background-color:#FCFCFC;
+    border:1px solid #67c1a5; 
+    color:#67c1a5;
+  }
+  #formbutton:active{
+    background-color:#67c1a5;
+    color:white;
+    border:0;
+  }
+  .updatetr{
+    display:none;
+    color:#67c1a5;
+  }
+  .updatetr td{
+    margin-top:1px;
+    border:1px solid #67c1a5;
+
+  }
+  .updatetr input{
+    width:100%;
+    height:100%;
+    border: 0;
+    background: #f8f8f8;
+    text-align: center;
+  }
+  .updatetr span{
+    color:#000;
+  }
+  .updatetr i{
+    color:#666;
+  }
+  .alltd th{
+    border-bottom: 1px solid #67c1a5;
+  }
+  .alltd td{
+    border-bottom: 1px solid #67c1a5;
+  }
+  .btm_btn{
+    width:20%;
+    height:15%;
+    margin: 0 auto;
+    padding: 1%;
+    background: #f8f8f8;
+    margin-top: 15%;
+    border-radius: 5px;
+    text-align: center;
+  }
+  .input_btn{
+    width:30%;
+    height:30px;
+    border-radius: 3px;
+    border: 1px solid #67c1a5;
+    line-height: 30px;
+  }
+  .input_btn:hover{
+    background-color: #f8f8f8;
+    color:#333;
+  }
+  .input_btn{
+    background-color: #67c1a5;
+    color:white;
+  }
+  h5{
+    font-size: 12px;
+    margin-top: 0.17em;
+}
+h2{
+  color:#999;
+}
+.meg{
+  display: none;
+  background: rgba(0,0,0,.35);
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 102;
+}
+.meginfo{
+  width:10%;
+  height:6%;
+  margin: 0 auto;
+  padding: 1%;
+  background: #f8f8f8;
+  margin-top: 16%;
+  border-radius: 5px;
+  text-align: center;
+}
+#megbtn{
+  width: 50px;
+  height: 50px;
+  border: 2px solid #67c1a5;
+  border-radius: 100%;
+  float: left;
+}
+h6{
+  color:#67c1a5;
+  font-size: 30px;
+  margin-top:0.3em;
+  margin-left: 0.43em;
+}
+#megmeg{
+    line-height: 2.2em;
+    font-size: 1.9em;
+    margin-left: 15px;
+    position:relative;
+    right:-10px;
+    
+}
+</style>
+</head>
+<body>
+<!--header-->
+<header>
+ <h1><img src="__PUBLIC__/Admin/images/admin_logo.png"/></h1>
+ <ul class="rt_nav">
+  <!-- <li><a href="http://www.baidu.com" target="_blank" class="website_icon">站点首页</a></li> -->
+  <!-- <li><a href="#" class="admin_icon">DeathGhost</a></li> -->
+  <!-- <li><a href="#" class="set_icon">账号设置</a></li> -->
+  <li><a href="#" class="admin_icon">{$user}</a></li>
+  <li><a href="{:U('Admin/login/logout')}" class="quit_icon">安全退出</a></li>
+ </ul>
+</header>
+<!--aside nav-->
+<aside class="lt_aside_nav content mCustomScrollbar">
+ <!-- <h2><a href="index.php">起始页</a></h2> -->
+ <ul>
+  <li>
+   <dl>
+    <dt><a href="{:U('Admin/manage/index')}">用户信息</a></dt>
+    <dt><a href="{:U('Admin/manage/count_use_info')}">系统数据统计</a></dt> <!-- 总的使用数据统计 各店铺使用情况统计-->
+    <dt><a href="{:U('Admin/manage/show_stroe_useinfo')}">客户使用数据</a></dt>
+    <dt><a href="{:U('Admin/manage/add_name_resource')}" class="actived">补充起名资源</a></dt>
+   </dl>
+  </li>
+ </ul>
+</aside>
+<section class="rt_wrap content mCustomScrollbar">
+    <section class="meg">
+        <div class="meginfo">
+          <div id="megbtn"><h6 id="megimg">√</h6></div>
+          <div id="megmeg">删除成功！</div>
+       </div>
+    </section>
+    <section>
+      <br/>
+      <div class="page_title">
+       <h2 class="fl">用户信息表</h2>
+       <!-- <a class="fr top_rt_btn rightb" href="javascript:void(0);" onclick="addshow();">添加用户</a>
+       <a class="fr top_rt_btn righta" href="{:U('Admin/manage/exportAll',array('type'=>'user'))}">数据导出</a> -->
+      </div>
+      <form action="{:U('Admin/manage/post_name_resource')}" method="post">
+        <table class="table">
+           <tr>
+            <td >姓氏</td>
+            <td ><input type="text" name="xing" id="xing"></td>
+            <td >分隔符</th>
+            <td ><input type="text" name="separator" id="separator"></td>
+            <td>性别</td>
+            <td>
+              <select name="gender" id="gender">
+                <option value="girl">女</option>
+                <option value="boy">男</option>
+              </select>
+            </td>
+           </tr>
+           <tr>
+            <td >资源</td>
+            <td colspan="5"><textarea name="name" id="name" cols="150" rows="20" placeholder="除姓名和分隔符外不要包含其它字符!"></textarea>
+           </tr>
+           <tr>
+            <td colspan="6">
+              <button type="submit">添加资源</button>
+            </td>
+           </tr>
+        </table>
+      </form>
+     </section>
+</section>
+</body>
+</html>

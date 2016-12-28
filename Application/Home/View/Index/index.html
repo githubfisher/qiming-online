@@ -1,0 +1,100 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>在线起名 姓名测试</title>
+<link href="__PUBLIC__/Home/Index/css/bootstrap.css" rel='stylesheet' type='text/css' />
+<link href="__PUBLIC__/Home/Index/css/style.css" rel='stylesheet' type='text/css' />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href='http//fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800' rel='stylesheet' type='text/css'>
+<link href='http//fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700' rel='stylesheet' type='text/css'>
+<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+<!--<link href="css/style.css" rel="stylesheet" type="text/css" media="all" />-->
+<script src="__PUBLIC__/Home/Index/js/jquery.min.js"></script>
+<script type="text/javascript">
+		var dafenurl = "{'Home/index/name_dafen'}";
+		jQuery(document).ready(function($) {
+			$(".scroll").click(function(event){		
+				event.preventDefault();
+				$('html,body').animate({scrollTop:$(this.hash).offset().top},1200);
+			});
+		});
+		function checkqiming(){
+			var code = document.getElementById("qiming").value;
+			if(code == 1){
+				window.location.href = "{:U('Home/index/name_query')}";
+			}else{
+				alert('该应用未经授权，不能使用！请联系客服代表：010-67538951。');
+			}	
+		}
+		function checkdafen(){
+			var code = document.getElementById("dafen").value;
+			if(code == 2){
+				window.location.href = "{:U('Home/index/name_dafen')}";
+			}else{
+				alert('该应用未经授权，不能使用！请联系客服代表：010-67538951。');
+			}	
+		}
+	</script>
+<!-- grid-slider -->
+<script type="text/javascript" src="__PUBLIC__/Home/Index/js/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="__PUBLIC__/Home/Index/js/jquery.contentcarousel.js"></script>
+<script type="text/javascript" src="__PUBLIC__/Home/Index/js/jquery.easing.1.3.js"></script>
+<!-- //grid-slider -->
+</head>
+<body>
+	  <div class="header-bottom">
+		 <div class="container">
+		   <div class="clear"></div>
+		</div>
+	  </div>
+	<!-- end header_bottom -->
+	<!-- start menu -->
+    <div class="menu" id="menu">
+	  <div class="container">
+		 
+	</div>
+	<!-- end menu -->
+	 <div class="main">
+	 	 <div class="container">
+			<!-- start content-top -->
+			
+		 </div>
+		<!-- end content-top -->
+		<div class="container">
+		    <div class="row content-middle">
+		      <!-- start content-middle -->
+	 	    	<div class="col-md-4">
+	 	    		<ul class="spinning">
+	 	    			<li class="live"><span class="m_1">在线起名</span></li>
+	 	    			<div class="clear"></div>	
+	 	    		</ul>
+					 <div class="view view-fifth">
+				  	   <a href="javascript:void(0);" onclick="checkqiming();"><img src="__PUBLIC__/Home/Index/images/pic3.jpg" class="img-responsive" alt=""/></a>
+	                  </div>
+			     </div><br>
+				<div class="col-md-4">
+	 	    		<ul class="spinning">
+	 	    			<li class="live"><span class="m_1">在线测名</span></li>
+	 	    			<div class="clear"></div>	
+	 	    		</ul>
+					 <div class="view view-fifth">
+				  	   <a href="javascript:void(0);" onclick="checkdafen();"><img src="__PUBLIC__/Home/Index/images/pic2.jpg" class="img-responsive"  alt=""/></a>
+	                  </div>
+			    </div>
+			    <div class="col-md-4">
+	 	    		<ul class="spinning" style="background:#fff;>
+	 	    			<li class="live"><span class="m_1"></span></li>
+	 	    			<div class="clear"></div>	
+	 	    		</ul>
+					 <div class="view1 view-fifth" ">
+				  	  <div style="margin:60px auto 0px auto; text-align:center;"><p style="font-size:13px; color:#999; ">技术支持：北京乐兔电子商务有限公司</p></div>
+	                  </div>
+			    </div>
+			    <form action="#" method="post" id="hiddenform">
+			    	<input type="hidden" name="qiming" id="qiming" value="{$code['1']}"></input>
+			    	<input type="hidden" name="dafen" id="dafen" value="{$code['2']}"></input>
+			    </form>
+
+</html>

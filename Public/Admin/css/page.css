@@ -1,0 +1,33 @@
+    .b-page {
+        background:#fff;
+        box-shadow:0 1px 2px 0 #e2e2e2
+    }
+    .b-page .page {
+        width:100%;
+        padding:30px 15px;
+        background:#fff;
+        text-align:center;
+        overflow:hidden
+    }
+    .b-page .page .first,.b-page .page .prev,.b-page .page .current,.b-page .page .num,.b-page .page .current,.b-page .page .next,.b-page .page .end {
+        padding:8px 16px;
+        margin:0 5px;
+        display:inline-block;
+        color:#008cba;
+        border:1px solid #f2f2f2;
+        border-radius:5px
+    }
+    .b-page .page .first:hover,.b-page .page .prev:hover,.b-page .page .current:hover,.b-page .page .num:hover,.b-page .page .current:hover,.b-page .page .next:hover,.b-page .page .end:hover {
+        text-decoration:none;
+        background:#f8f5f5
+    }
+    .b-page .page .current {
+        background-color:#008cba;
+        color:#fff;
+        border-radius:5px;
+        border:1px solid #008cba
+    }
+    .b-page .page .current:hover {
+        text-decoration:none;
+        background:#008cba
+    }

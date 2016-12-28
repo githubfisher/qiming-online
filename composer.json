@@ -1,0 +1,21 @@
+{
+    "name": "githubfisher/qiming-online",
+    "description": "web site for baby name",
+    "type": "library",
+    "keywords": [
+        "website",
+        "thinkphp",
+        "baby"
+        ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "fisher",
+            "email": "gooodfisher@126.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "minimum-stability": "dev"
+}

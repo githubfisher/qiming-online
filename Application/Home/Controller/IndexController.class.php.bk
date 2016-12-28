@@ -1,0 +1,386 @@
+<?php
+namespace Home\Controller;
+use Think\Controller;
+class IndexController extends Controller {
+    public function _initialize(){
+        header("content-type:text/html; charset=utf-8;");
+    }
+    public function index(){
+        //接收授权码
+        $post = I();
+        $code = $post['secretcode'];
+        //查询授权码是否正确
+        $admin = D('admin');
+        $where = array(
+            'secretcode' => $code
+        );
+        $result = $admin->where($where)->find();
+        if($result){
+            $code = 1;
+            $uid = $result['id'];
+        }else{
+            $code = 0;
+            $uid = 1;
+        }
+        $this->assign('code',$code);
+        $this->assign('uid',$uid);
+    	$this->assign('title','起名');
+        $this->show();
+    }
+    // 查询‘三藏起名’
+    public function query(){
+    	$post = I();
+    	$xing = $post['xing'];
+    	$gender = $post['gender'];
+    	$nums = $post['nums'];
+        $phone = $post['phone'];
+        $uid = $post['uid'];
+        $parent = $post['parent'];
+        $birth = $post['birth'];
+        $email = $post['email'];
+        $uid = $post['uid'];
+        $code = $post['secretcode'];
+    	if($xing && $phone && $parent && $birth){
+            session('xing',$xing);
+            session('phone',$phone);
+            session('parent',$parent);
+            session('birth',$birth);
+            session('nums',$nums);
+            session('gender',$gender);
+            logger('存入session:姓氏->'.session('xing').'性别->'.session('gender').'名字字数'.session('nums'));
+    		 // 先查询数据是否已经存储在数据库中
+            $name = D('name');
+            if($nums == 0){
+                 $where = array(
+                    'xing' => $xing,
+                    'baby_geneder' => $gender,
+                    'nums' => array(array('eq','1'),array('eq','2'),'or')
+                );
+            }else{
+                $where = array(
+                    'xing' => $xing,
+                    'baby_geneder' => $gender,
+                    'nums' => $nums
+                );
+            }
+            $isname = $name->where($where)->select();
+            if($isname){
+                logger('数据库直接返回起名数据!');
+                $name_arr = $isname;
+            }else{
+                logger('数据库无数据,执行在线起名系统');
+                $url = C('QiMing');
+                //$info = '?qiming='.$xing.'&setsex='.$gender.'&setming='.$nums;
+                //增加循环，获取500-600个名字 2016-05-20
+                $qiming = array();
+                $i = 1;
+                $max = 7;
+                if($nums == 1){
+                    $max = 5;
+                }
+                while($i<$max){
+                    $info = '?qiming='.$xing.'&page='.$i.'&setsex='.$gender.'&setming='.$nums;
+                    // logger('请求网址参数：'.$info);
+                    //强制转换编码
+                    $url = mb_convert_encoding($url,'gb2312','utf8');
+                    $info = mb_convert_encoding($info,'gb2312','utf8');
+                    $result = getMingZi($url,$info);
+                    $result = mb_convert_encoding($result, 'utf8', 'gb2312');
+                    // logger('result:'.$result); //debug
+                    $res = strchr(strchr($result,'<div class="li5_list">'),'</div>',TRUE);
+                    // logger('res:'.$res); //debug
+                    $es = ltrim($res,'<div class="li5_list"><ul><li>');
+                    // logger('es:'.$es); //debug
+                    $arr = explode('</li><li>',$es);
+                    // logger('array:'.var_export($arr,TRUE)); //debug
+                    $qiming[$i] = $this->list_arr($arr);
+                    // logger('结果--------------'.$i.'---:'.var_export($qiming[$i],TRUE)); //debug
+                    $i++;
+                }
+                $name_arr = array();
+                foreach($qiming as $k => $v){
+                    if($v[0]['name'] != '' || $v[0]['name'] != NULL){
+                         $name_arr = array_merge_recursive($name_arr,$v);
+                    }
+                }
+                // logger('整体结果:'.var_export($name_arr,TRUE)); die; //debug
+                //存储查询结果
+                $name = D('name');
+                foreach($name_arr as $k => $v){
+                    if(strlen($v['name']) == 6){
+                        $name_nums = 1;
+                    }else{
+                        //logger(strlen($v['name'])); //debug
+                        $name_nums = 2;
+                    }
+                    $res_name = array(
+                        'xing' => $xing,
+                        'nums' => $name_nums,
+                        'name' => $v['name'],
+                        'baby_geneder' => $gender,
+                        'time' => time()
+                    );
+                    $result_name_in = $name->add($res_name);
+                    if($result_name_in){
+                        logger('存储起名数据到数据库成功！');
+                    }else{
+                        logger('存储起名数据到数据库失败！');
+                    }
+                }
+            }
+            //将在线起名用户的信息录入到数据库
+            $info = D('info');
+            //先查询是否已有相同手机号和姓氏录入
+            $where = array(
+                'xing' => $xing,
+                'phone' => $phone,
+                'uid' => $uid
+            );
+            $result = $info->where($where)->find();
+            if($result){
+                $data = array(
+                    'xing' => $xing,
+                    'baby_geneder' => $gender,
+                    'time' => time(),
+                    'nums' => $nums,
+                    'ip' => get_client_ip(),
+                    'parent' => $parent,
+                    'birth' => $birth,
+                    'email' => $email,
+                    'times' => $result['times'] + 1
+                );
+                $res = $info->where($where)->save($data);
+            }else{
+                $data = array(
+                    'xing' => $xing,
+                    'phone' => $phone,
+                    'baby_geneder' => $gender,
+                    'time' => time(),
+                    'nums' => $nums,
+                    'times' => 1,
+                    'ip' => get_client_ip(),
+                    'uid' => $uid,
+                    'parent' => $parent,
+                    'birth' => $birth,
+                    'email' => $email
+                );
+                $res = $info->add($data);
+                if($res){
+                    logger('在线起名用户信息写入成功！');
+                }else{
+                    logger('在线起名用户信息写入失败！');
+                }
+            }
+            $this->assign('code',$code);
+            $this->assign('uid',$uid);
+            // 输出起名结果到前端页面
+            $this->assign('name',$name_arr);
+            $this->display('index');
+    	}else{
+            //手机端返回页面,无输入信息,用session中信息代替
+            logger('手机端返回-->');
+            $xing = session('xing');
+            $gender = session('gender');
+            $nums = session('nums');
+            if($xing && $gender && $nums){
+                logger('存在上次查询数据 --> 重新查询');
+                 // 先查询数据是否已经存储在数据库中
+                $name = D('name');
+                if($nums == 0){
+                     $where = array(
+                        'xing' => $xing,
+                        'baby_geneder' => $gender,
+                        'nums' => array(array('eq','1'),array('eq','2'),'or')
+                    );
+                }else{
+                    $where = array(
+                        'xing' => $xing,
+                        'baby_geneder' => $gender,
+                        'nums' => $nums
+                    );
+                }
+                $isname = $name->where($where)->select();
+                if($isname){
+                    logger('数据库直接返回起名数据!');
+                    $name_arr = $isname;
+                }else{
+                    logger('数据库无数据,执行在线起名系统');
+                    $url = C('QiMing');
+                    //$info = '?qiming='.$xing.'&setsex='.$gender.'&setming='.$nums;
+                    //增加循环，获取500-600个名字 2016-05-20
+                    $qiming = array();
+                    $i = 1;
+                    $max = 7;
+                    if($nums == 1){
+                        $max = 5;
+                    }
+                    while($i<$max){
+                        $info = '?qiming='.$xing.'&page='.$i.'&setsex='.$gender.'&setming='.$nums;
+                        // logger('请求网址参数：'.$info);
+                        //强制转换编码
+                        $url = mb_convert_encoding($url,'gb2312','utf8');
+                        $info = mb_convert_encoding($info,'gb2312','utf8');
+                        $result = getMingZi($url,$info);
+                        $result = mb_convert_encoding($result, 'utf8', 'gb2312');
+                        // logger('result:'.$result); //debug
+                        $res = strchr(strchr($result,'<div class="li5_list">'),'</div>',TRUE);
+                        // logger('res:'.$res); //debug
+                        $es = ltrim($res,'<div class="li5_list"><ul><li>');
+                        // logger('es:'.$es); //debug
+                        $arr = explode('</li><li>',$es);
+                        // logger('array:'.var_export($arr,TRUE)); //debug
+                        $qiming[$i] = $this->list_arr($arr);
+                        // logger('结果--------------'.$i.'---:'.var_export($qiming[$i],TRUE)); //debug
+                        $i++;
+                    }
+                    $name_arr = array();
+                    foreach($qiming as $k => $v){
+                        if($v[0]['name'] != '' || $v[0]['name'] != NULL){
+                             $name_arr = array_merge_recursive($name_arr,$v);
+                        }
+                    }
+                    // logger('整体结果:'.var_export($name_arr,TRUE)); die; //debug
+                    //存储查询结果
+                    $name = D('name');
+                    foreach($name_arr as $k => $v){
+                        if(strlen($v['name']) == 6){
+                            $name_nums = 1;
+                        }else{
+                            //logger(strlen($v['name'])); //debug
+                            $name_nums = 2;
+                        }
+                        $res_name = array(
+                            'xing' => $xing,
+                            'nums' => $name_nums,
+                            'name' => $v['name'],
+                            'baby_geneder' => $gender,
+                            'time' => time()
+                        );
+                        $result_name_in = $name->add($res_name);
+                        if($result_name_in){
+                            logger('存储起名数据到数据库成功！');
+                        }else{
+                            logger('存储起名数据到数据库失败！');
+                        }
+                    }
+                }
+                 // 输出起名结果到前端页面
+                $this->assign('name',$name_arr);
+                $this->display('index');
+            }else{
+                logger('不存在session数据,同时也什么也没有输入');
+                $this->error('请输入姓氏和联系方式！');
+            }	
+    	}
+
+    }
+    // 每个名字的详细描述
+    public function details(){
+    	$post = I();
+    	/*$xing = $post['xing'];
+    	$ming = $post['ming'];
+    	if($xing && $ming){
+    		$url = C('Ceshi');
+    		$info = '?x='.$xing.'&m='.$ming;
+    		//强制转换编码
+    		$url = mb_convert_encoding($url,'gb2312','utf8');
+    		$info = mb_convert_encoding($info,'gb2312','utf8');
+    		$result = getMingZi($url,$info);
+    		$result = mb_convert_encoding($result, 'utf8', 'gb2312');
+    		logger('result:'.$result); //debug
+		*/
+    	$xm = $post['xm'];
+    	if($xm){
+    		// 判断是否姓名测试内容已经存在数据库中
+            $details = D('name_details');
+            $where = array(
+                'xm' => $xm
+            );
+            $details_result = $details->where($where)->find();
+            if($details_result){
+                logger('数据库中已存在该姓名测试，由数据库直接返回！');
+                $data = $details_result;
+            }else{
+                //截取姓和名
+                $x = substr($xm,0,3);
+                $m = substr($xm,3);
+                // 访问三藏网
+                $url = C('Ceshi');
+                $info = '?x='.$x.'&m='.$m;
+                //强制转换编码
+                $url = mb_convert_encoding($url,'gb2312','utf8');
+                $info = mb_convert_encoding($info,'gb2312','utf8');
+                $result = getMingZi($url,$info);
+                $result = mb_convert_encoding($result, 'utf8', 'gbk');
+                // logger('result:'.$result); //debug
+                $jx = strchr(strchr($result,'<div class="c_1">'),'<div class="c1_share">',TRUE).'</div>';
+                // logger('吉凶:'.$jx); //debug
+
+                $tghead = strchr(strchr($result,'<p class="font_wuge">'),'（<span>',TRUE);
+                $tgbody = strchr(strchr($result,'<p><strong>'),'<p>（<a href=',TRUE);
+                // logger('天格：'.$tg); //debug
+
+                $result = substr($result,strpos($result,'<p class="font_gray">') + 19);
+                // logger('新result:'.$result);//debug
+                $rghead = strchr(strchr($result,'<p class="font_wuge">'),'（<span>',TRUE);
+                $rgbody= strchr(strchr($result,'<p><strong>'),'<p>（<a href=',TRUE);
+                // logger('人格：'.$rg); //debug
+
+                $result = substr($result,strpos($result,'<p class="font_gray">') + 19);
+                // logger('新result:'.$result);//debug
+                $dghead = strchr(strchr($result,'<p class="font_wuge">'),'（<span>',TRUE);
+                $dgbody= strchr(strchr($result,'<p><strong>'),'<p>（<a href=',TRUE);
+                // logger('地格：'.$dg); //debug
+
+                $result = substr($result,strpos($result,'<p class="font_gray">') + 19);
+                // logger('新result:'.$result);//debug
+                $wghead = strchr(strchr($result,'<p class="font_wuge">'),'（<span>',TRUE);
+                $wgbody= strchr(strchr($result,'<p><strong>'),'<p>（<a href=',TRUE);
+                // logger('外格：'.$wg); //debug
+
+                $result = substr($result,strpos($result,'<p class="font_gray">') + 19);
+                // logger('新result:'.$result);//debug
+                $zghead = strchr(strchr($result,'<p class="font_wuge">'),'（<span>',TRUE);
+                $zgbody= strchr(strchr($result,'<p><strong>'),'<p>（<a href=',TRUE);
+                // logger('总格：'.$zg); //debug
+                //综合这些数据
+                $data = array(
+                    'xm' => $xm,
+                    'jx' => $jx,
+                    'tghead' => $tghead,
+                    'tgbody' => $tgbody,
+                    'rghead' => $rghead,
+                    'rgbody' => $rgbody,
+                    'dghead' => $dghead,
+                    'dgbody' => $dgbody,
+                    'wghead' => $wghead,
+                    'wgbody' => $wgbody,
+                    'zghead' => $zghead,
+                    'zgbody' => $zgbody,
+                    'time' => time()
+                );
+                logger('获得姓名测试数据，存入数据库'); //debug
+                $in_details_result = $details->add($data);
+                if($in_details_result){
+                    logger('姓名测试内容存入数据库成功！');
+                }else{
+                    logger('姓名测试内容存入数据库成功！');
+                }
+            }
+            $this->assign('data',$data);
+            $this->display();
+    	}else{ 
+    		$this->error('服务器失联，请稍后重试！');
+    	}
+    }
+    //处理函数列表
+    public function list_arr($a){
+    	$array = array();
+    	foreach($a as $k => $v){
+    		//$array[$k]['url'] = ltrim(strchr(strchr($v,"href='"),"' ",TRUE),"href='"); 
+    		$array[$k]['name'] = ltrim(strchr(strchr($v,"_blank'>"),"</a>",TRUE),"_blank'>"); 
+    	}
+    	return $array;
+    }
+
+}
